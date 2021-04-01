@@ -14,9 +14,9 @@ import Table from "../../Utilities/Table";
 import Modal from "../../Utilities/Modal";
 
 export default function Home(props) {
-  const ticket_title ="Active Tickets";
+  const ticket_title = "Active Tickets";
   const [ticket_data, setTicket_data] = useState([]);
-  const [project, setProject] = useState();
+  const [project, setProject] = useState('');
   const [show_modal, setShow_modal] = useState(false);
   const { register, handleSubmit, errors } = useForm();
 
@@ -42,8 +42,8 @@ export default function Home(props) {
     getParam();
   }, []);
 
- 
-//  fetch data
+
+  //  fetch data
   const getTickets = async () => {
     try {
       axios.get("tickets").then((data) => {
@@ -84,8 +84,25 @@ export default function Home(props) {
   };
 
 
+  useEffect(() => {
+
+    const interval = setInterval( async () => {
+      try {
+        let res = await axios.post("tickets/pushtojira");
+        console.log(res.data);
+      } catch (err) {
+        console.log(err.message || "Error fetching tickets automatically")
+      }
+    }, 80000)
+
+
+    return () => clearInterval(interval)
+  }, [])
+
+
+
   // pullTickets from helpdesk
-  const pullTickets = () =>{
+  const pullTickets = () => {
     console.log("pulling from helpdesk ...");
     try {
       axios.post("tickets").then((data) => {
@@ -104,42 +121,42 @@ export default function Home(props) {
     }
   }
 
-    // pushTickets to Jira
-    const pushTickets = () =>{
-      console.log("pushing from helpdesk ...");
-      try {
-        axios.post("tickets/pushtojira").then((data) => {
-          console.log(data.data);
-          let response = data.data;
-          if (response.code == 1) {
-            toast("several tickets pushed to Jira successfully")
-          } else {
-            toast.error(response.message || "Error pulling tickets or no new tickets found")
-          }
-        });
-      } catch (err) {
-        toast.error(err.message)
-        console.log(err.message || "Error Fetching tickets");
-        return [];
-      }
+  // pushTickets to Jira
+  const pushTickets = () => {
+    console.log("pushing from helpdesk ...");
+    try {
+      axios.post("tickets/pushtojira").then((data) => {
+        console.log(data.data);
+        let response = data.data;
+        if (+response.code === 1) {
+          toast("several tickets pushed to Jira successfully")
+        } else {
+          toast.error(response.message || "Error pulling tickets or no new tickets found")
+        }
+      });
+    } catch (err) {
+      toast.error(err.message)
+      console.log(err.message || "Error Fetching tickets");
+      return [];
     }
+  }
 
   // post data
   const onSubmit = (data) => {
     console.log(data)
     try {
-      axios.put("params/1",data).then((data) => {
+      axios.put("params/1", data).then((data) => {
         let response = data.data;
         console.log(response);
-        if (response.code == -1) {
+        if (+response.code === -1) {
           toast(response.message)
-        }else{
+        } else {
           toast(response.message)
         }
-        
+
       });
     } catch (err) {
-      console.log({err});
+      console.log({ err });
       console.log(err.message || "Error Fetching tickets");
     }
   };
@@ -151,13 +168,13 @@ export default function Home(props) {
       <nav aria-label="breadcrumb mt-5">
         <ol className="breadcrumb">
           <li className="breadcrumb-item active" aria-current="page">
-             Home 
+            Home
           </li>
         </ol>
       </nav>
       <hr />
 
-      
+
 
       <article className="row mb-5">
         <div className="col-12 col-sm-6">
@@ -189,13 +206,13 @@ export default function Home(props) {
           <div className="row">
             <div className="col-12 col-md-6">
               <button className="btn btn-info w-100 crud-button"
-              onClick= {() => pullTickets()}>
+                onClick={() => pullTickets()}>
                 <VerticalAlignBottomIcon /> Helpdesk Pull
               </button>
             </div>
             <div className="col-12 col-md-6">
-              <button className="btn btn-info w-100 crud-button" 
-              onClick= {() => pushTickets()}>
+              <button className="btn btn-info w-100 crud-button"
+                onClick={() => pushTickets()}>
                 <VerticalAlignTopIcon /> Jira Push
               </button>
             </div>
@@ -222,7 +239,7 @@ export default function Home(props) {
                 className="form-control"
                 name="project"
                 value={project}
-                onChange= {(e) => setProject(e.target.value)}
+                onChange={(e) => setProject(e.target.value)}
                 id="project_entry"
                 ref={register({ required: true })}
                 placeholder="Enter project name"
