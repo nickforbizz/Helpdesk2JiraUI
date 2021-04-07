@@ -17,6 +17,7 @@ export default function Home(props) {
   const ticket_title = "Active Tickets";
   const [ticket_data, setTicket_data] = useState([]);
   const [project, setProject] = useState('');
+  const [projectlead, setProjectlead] = useState('');
   const [show_modal, setShow_modal] = useState(false);
   const { register, handleSubmit, errors } = useForm();
 
@@ -76,6 +77,7 @@ export default function Home(props) {
       axios.get("params/1").then((data) => {
         let response = data.data;
         setProject(response.project);
+        setProjectlead(response.project_lead);
       });
     } catch (err) {
       console.log(err.message || "Error Fetching tickets");
@@ -88,14 +90,14 @@ export default function Home(props) {
 
     const interval = setInterval( async () => {
       try {
-        let res = await axios.post("tickets/pushtojira");
+        let res = await axios.post("tickets");
+        let res2 = await axios.post("tickets/pushtojira");
         console.log(res.data);
+        console.log(res2.data);
       } catch (err) {
         console.log(err.message || "Error fetching tickets automatically")
       }
     }, 80000)
-
-
     return () => clearInterval(interval)
   }, [])
 
@@ -245,6 +247,23 @@ export default function Home(props) {
                 placeholder="Enter project name"
               />
               {errors.project && (
+                <span className="text-danger"> * This field is required</span>
+              )}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="project_entry">Project Lead</label>
+              <input
+                type="text"
+                className="form-control"
+                name="project_lead"
+                value={projectlead}
+                onChange={(e) => setProjectlead(e.target.value)}
+                id="project_lead"
+                ref={register({ required: true })}
+                placeholder="Enter project lead"
+              />
+              {errors.project_lead && (
                 <span className="text-danger"> * This field is required</span>
               )}
             </div>

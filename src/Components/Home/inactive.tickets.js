@@ -64,7 +64,7 @@ export default function Inactivetickets(props) {
           <li className="breadcrumb-item">
             <Link to="/">Home</Link>
           </li>
-          <li class="breadcrumb-item active" aria-current="page">Library</li>
+          <li className="breadcrumb-item active" aria-current="page">Library</li>
         </ol>
       </nav>
       <hr />
