@@ -245,6 +245,7 @@ export default function Home(props) {
                 id="project_entry"
                 ref={register({ required: true })}
                 placeholder="Enter project name"
+                readOnly
               />
               {errors.project && (
                 <span className="text-danger"> * This field is required</span>
